@@ -70,7 +70,6 @@ class LearningAgent(Agent):
         state = (waypoint, inputs['light'], inputs['oncoming'], inputs['left'], inputs['right'])
         if not state in self.Q:
             self.Q[state] = {key: 0 for key in self.valid_actions}
-        # state = None
         return state
 
 
@@ -97,9 +96,11 @@ class LearningAgent(Agent):
         # When learning, check if the 'state' is not in the Q-table
         # If it is not, create a new dictionary for that state
         #   Then, for each action available, set the initial Q-value to 0.0
-        if self.learning ==True:
-            if state not in self.Q.keys():
-                self.Q[state] = {key:0 for key in self.valid_actions}
+        # if self.learning:
+        #     if state not in self.Q.keys():
+        #         self.Q[state] = {key:0 for key in self.valid_actions}
+        if self.learning:
+            self.Q.setdefault(state, {action: 0.0 for action in self.valid_actions})
         return self.Q
 
 
@@ -142,9 +143,8 @@ class LearningAgent(Agent):
         ###########
         # When learning, implement the value iteration update rule
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
-        if self.learning ==True:
-            qu = self.Q[state][action]
-            self.Q[state][action] = qu + self.alpha*(reward-qu)
+        if self.learning :
+            self.Q[state][action] = self.Q[state][action] + self.alpha*(reward-self.Q[state][action])
             # self.Q[state][action] += self.alpha*(reward-self.Q[state][action])
         return
 
@@ -181,7 +181,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent,learning = True,alpha = 0.01)
+    agent = env.create_agent(LearningAgent,learning = True,alpha = 0.001)
 
     ##############
     # Follow the driving agent
